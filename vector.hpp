@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test.cpp                                           :+:      :+:    :+:   */
+/*   vector.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: agachet <agachet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/10 17:50:06 by agachet           #+#    #+#             */
-/*   Updated: 2022/01/21 18:26:27 by agachet          ###   ########.fr       */
+/*   Updated: 2022/10/05 16:18:06 by agachet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@
 namespace ft {
     template < class T, class Alloc = std::allocator<T> >
     class vector {
-    
-    public: 
+
+    public:
         typedef T												value_type;
 		typedef Alloc										allocator_type;
 		typedef typename allocator_type::reference				reference;
@@ -36,7 +36,7 @@ namespace ft {
 		typedef VectorIterator<const_pointer>			    	const_iterator;
 		typedef ft::reverse_iterator<iterator>				    reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator>		    const_reverse_iterator;
-        
+
         explicit vector (const allocator_type& myAlloc = allocator_type()) : _myAlloc(myAlloc), _vecSize(0) , _capacity(0) {}
 
         explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& myAlloc = allocator_type()) : _myAlloc(myAlloc), _vecSize(n), _capacity(n) {
@@ -59,7 +59,7 @@ namespace ft {
                 tmpFirst++;
             }
        }
-        
+
         vector (const vector& x) {
             this->_capacity = x._capacity;
             this->_vecSize = x._vecSize;
@@ -131,10 +131,10 @@ namespace ft {
 
         void resize (size_type n, value_type val = value_type()) {
             pointer tmp = _myAlloc.allocate(n);
-            size_t i = 0;
+            size_t i;
 
             this->_vecSize = n;
-            for (i; i < n || i < this->_vecSize; i++)
+            for (i = 0; i < n || i < this->_vecSize; i++)
                 tmp[i] = this->_array[i];
             if (n > this->_capacity * 2)
                 this->_capacity = n;
@@ -142,9 +142,9 @@ namespace ft {
                 this->_capacity *= 2;
             reallocArray(this->_capacity);
             i = 0;
-            for (i; i < n || i < this->_vecSize; i++)
+            for (i = 0; i < n || i < this->_vecSize; i++)
                 this->_array[i] = tmp[i];
-            for (i; i < n; i++)
+            for (i = 0; i < n; i++)
                 this->_array[i] = val;
             this->_array[i] = NULL;
             delete [] tmp;
@@ -156,11 +156,11 @@ namespace ft {
 
         void reserve (size_type n) {
             pointer tmp = _myAlloc.allocate(n);
-            
+
       //      if (n > this->max_size())
        //         throw length_error("msg");
             if (n > this->_capacity) {
-                this->_capacity = n;            
+                this->_capacity = n;
                 for (size_t i = 0; i < this->_vecSize; i++)
                     tmp[i] = this->_array[i];
                 reallocArray(n);
@@ -181,7 +181,7 @@ namespace ft {
         reference back() {
             return _array[this->_vecSize - 1];
         }
-        
+
         const_reference back() const {
             return _array[this->_vecSize - 1];
         }
@@ -266,7 +266,7 @@ namespace ft {
 			position = this->insert(position, val);
         }
 
-        template <class InputIterator>    
+        template <class InputIterator>
         void insert (iterator position, InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, int>::type* = 0) {
             size_type index = position - begin();
 			if (index <= _capacity) {
@@ -329,7 +329,7 @@ namespace ft {
 
         void push_back (const value_type& val) {
             pointer tmp = _myAlloc.allocate(this->_capacity);
-            
+
             if (this->_vecSize + 1 > this->_capacity) {
                 for (size_t i = 0; i < this->_vecSize; i++)
                     tmp[i] = this->_array[i];
@@ -380,7 +380,7 @@ namespace ft {
         template <class _T, class _Alloc>
         friend bool operator== (const vector<_T,_Alloc>& lhs, const vector<_T,_Alloc>& rhs);
 
-        private: 
+        private:
 
         void cutInsert(size_type n) {
             if (this->_vecSize + n > this->_capacity) {
@@ -455,7 +455,7 @@ namespace ft {
     bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
         return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
     }
-    
+
 	template <class T, class Alloc>
 	bool operator<=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) {
 		return (!(rhs < lhs));

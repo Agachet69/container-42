@@ -6,7 +6,7 @@
 /*   By: agachet <agachet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/24 18:16:44 by agachet           #+#    #+#             */
-/*   Updated: 2022/09/24 18:16:44 by agachet          ###   ########.fr       */
+/*   Updated: 2022/10/05 21:04:24 by agachet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,33 +15,33 @@
 
 #include "utils.hpp"
 #include "pair.hpp"
-#include "reverse_iterator.hpp"
+#include "reverseIteratorMap.hpp"
 #include "binarySearchTree.hpp"
 #include "bidirectional_iterator.hpp"
 
 
 namespace ft {
-    template < class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<ft::pair<const Key,T> >> 
+    template < class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<ft::pair<const Key,T> > >
     class map {
 
         public:
-            typedef Key                                                                 key_type;
-            typedef T                                                                   mapped_type;
-            typedef ft::pair<const key_type,mapped_type>                                value_type;
-            typedef Compare                                                             key_compare;
-            typedef Alloc                                                               allocator_type;
-            typedef typename allocator_type::reference                                  reference;
-            typedef typename allocator_type::const_reference                            const_reference;
-            typedef typename allocator_type::pointer                                    pointer;
-            typedef typename allocator_type::const_pointer                              const_pointer;
-            typedef binarySearchTree<value_type>                                        node;
-            typedef ft::bidirectionnal_iterator<node, value_type>					    iterator;
-	    	typedef ft::const_bidirectionnal_iterator<node, const value_type, iterator> const_iterator;
-	    	typedef ft::reverse_iterator<iterator> 							            reverse_iterator;
-	    	typedef ft::reverse_iterator<const_iterator>					            const_reverse_iterator;
-	    	typedef std::ptrdiff_t 												        difference_type;
-	    	typedef size_t 														        size_type;
-            typedef typename Alloc::template rebind<node>::other                        allocator_node;
+            typedef Key                                                                 	key_type;
+            typedef T                                                                   	mapped_type;
+            typedef ft::pair<const key_type,mapped_type>                                	value_type;
+            typedef Compare                                                             	key_compare;
+            typedef Alloc                                                               	allocator_type;
+            typedef typename allocator_type::reference                                  	reference;
+            typedef typename allocator_type::const_reference                            	const_reference;
+            typedef typename allocator_type::pointer                                    	pointer;
+            typedef typename allocator_type::const_pointer                              	const_pointer;
+            typedef binarySearchTree<value_type>                                        	node;
+            typedef ft::bidirectionnal_iterator<node, value_type>					    	iterator;
+	    	typedef ft::const_bidirectionnal_iterator<node, const value_type, iterator> 	const_iterator;
+	    	typedef ft::reverse_iterator_m<node, value_type>							    reverse_iterator;
+	    	typedef ft::const_reverse_iterator<node, const value_type, reverse_iterator>	const_reverse_iterator;
+	    	typedef std::ptrdiff_t 												        	difference_type;
+	    	typedef size_t 														        	size_type;
+            typedef typename Alloc::template rebind<node>::other                        	allocator_node;
 
         protected:
             node                *_root;
@@ -51,8 +51,8 @@ namespace ft {
             allocator_type      _allocPair;
             allocator_node      _allocNode;
             size_t              _sizeMap;
-    
-        
+
+
         public:
             class value_compare {
                 friend class map;
@@ -67,14 +67,15 @@ namespace ft {
                         return comp(x.first, y.first);
                     }
             };
-        
+
             explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _sizeMap(0), _root(LEAF), _comp(comp), _allocPair(alloc), _allocNode(std::allocator<node>()) {
-                _end = _allocNode.allocate(1);
-			    _allocNode.construct(_end, node());
+				_end = _allocNode.allocate(1);
+				_allocNode.construct(_end, node());
                 _revBegin = _allocNode.allocate(1);
 			    _allocNode.construct(_revBegin, node());
                 _revBegin->_end = _end;
                 _revBegin->_parent = _end;
+                _root = NULL;
             }
 
             template <class InputIterator>
@@ -85,8 +86,11 @@ namespace ft {
 			    _allocNode.construct(_revBegin, node());
                 _revBegin->_end = _end;
                 _revBegin->_parent = _end;
-                for (first; first != last; first++)
-                    insert (*first);
+                _root = NULL;
+				while (first != last) {
+                    insert(*first);
+					first++;
+				}
             }
 
             map (const map& x) : _comp(x._comp), _allocPair(x._allocPair), _allocNode(x._allocNode), _root(NULL), _sizeMap(0) {
@@ -96,41 +100,48 @@ namespace ft {
     			_allocNode.construct(_revBegin, node());
                 _revBegin->_end = _end;
                 _revBegin->_parent = _end;
-
-    			clear();
+                _root = NULL;
+    			clear(); /* verif */
     			this->insert(x.begin(), x.end());
             }
-       
-            ~map() {
-                clear();
-			    _allocNode.destroy(_end);
-			    _allocNode.deallocate(_end, 1);
-			    _allocNode.destroy(_revBegin);
-			    _allocNode.deallocate(_revBegin, 1);
-            }
+
+            //~map() {
+            //    clear();
+			//    _allocNode.destroy(_end);
+			//    _allocNode.deallocate(_end, 1);
+			//    _allocNode.destroy(_revBegin);
+			//    _allocNode.deallocate(_revBegin, 1);
+            //}
 
             map& operator= (const map& x) {
-                clear();
-                _comp = x._compare;
+				//clear(); a verif
+                _comp = x._comp;
                 _sizeMap = 0;
                 _allocPair = x._allocPair;
                 _allocNode = x._allocNode;
                 _end = x._end;
-                insert(x.begin(), x.end());
+				const_iterator beg = x.begin();
+				const_iterator endx = x.end();
+				if (beg != endx)
+                	insert(beg, endx);
                 return (*this);
             }
 
             iterator begin() {
                 node *tmp = _root;
-                while (tmp && tmp->_left != LEAF) {
+                if (!tmp)
+					return this->end();
+				while (tmp && tmp->_left != LEAF) {
                    tmp = tmp->_left;
                 }
                 return iterator(tmp);
             }
-            
+
             const_iterator begin() const {
                 node *tmp = _root;
-                while (tmp && tmp->_left != LEAF) {
+                if (!tmp)
+					return this->end();
+				while (tmp && tmp->_left != LEAF) {
                     tmp = tmp->_left;
                 }
                 return const_iterator(tmp);
@@ -139,25 +150,39 @@ namespace ft {
             iterator end() {
                 return iterator(_end);
             }
-            
-            // const_iterator end() const {
-            //     return const_iterator(this->_revBegin->_end); 
-            // }
-		    
-            // reverse_iterator rbegin() {
-			//     return (reverse_iterator(_end));
-		    // }
-            // const_reverse_iterator rbegin() const {
-    		// 	return (const_reverse_iterator(_end));
-    		// }
 
-    		// reverse_iterator rend() {
-    		// 	return (reverse_iterator(_begin->parent));
-    		// }
+            const_iterator end() const {
+                return const_iterator(_end);
+            }
 
-    		// const_reverse_iterator rend() const {
-    		// 	return (const_reverse_iterator(_begin->parent));
-    		// }
+            reverse_iterator rbegin() {
+				node *tmp = _root;
+        	    if (!tmp)
+					return reverse_iterator(_end);
+				while (tmp && tmp->_right != LEAF) {
+        	        tmp = tmp->_right;
+        	    }
+        	    return reverse_iterator(tmp);
+			    // return (reverse_iterator(_end));
+		    }
+
+            const_reverse_iterator rbegin() const {
+    		 	node *tmp = _root;
+        	    if (!tmp)
+					return reverse_iterator(_end);
+				while (tmp && tmp->_right != LEAF) {
+        	        tmp = tmp->_right;
+        	    }
+				return (const_reverse_iterator(tmp));
+    		}
+
+    		reverse_iterator rend() {
+    		 	return (reverse_iterator(_end));
+    		}
+
+    		const_reverse_iterator rend() const {
+    			return (const_reverse_iterator(_end));
+    		}
 
             bool empty() const {
                 if (this->_sizeMap == 0)
@@ -174,19 +199,20 @@ namespace ft {
             }
 
             mapped_type& operator[] (const key_type& k) {
-               return (*((this->insert(make_pair(k,mapped_type()))).first)).second;
+			   return (*((this->insert(ft::make_pair(k,mapped_type()))).first)).second;
             }
 
             pair<iterator,bool> insert (const value_type& val) {
                 iterator finded = this->find(val.first);
+
                 if (finded == _end) {
-                   node *new_node = _allocNode.allocate(1); 
-				   _allocNode.construct(new_node, node(val));
+                	node *new_node = _allocNode.allocate(1);
+					_allocNode.construct(new_node, node(val));
                     if (recursiveInsert(this->_root, new_node) == 0) {
-                       insertFixTree(new_node);
-                       this->_sizeMap++;
+                		insertFixTree(new_node);
+                    	this->_sizeMap++;
                     }
-                    this->_root = getRoot(new_node);
+                	this->_root = getRoot(new_node);
                     new_node->_end = _end;
                     return (ft::make_pair(new_node, true));
                 }
@@ -194,14 +220,16 @@ namespace ft {
             }
 
             iterator insert (iterator position, const value_type& val) {
-                (void) position;
+				(void) position;
 			    return (insert(val).first);
             }
 
             template <class InputIterator>
             void insert (InputIterator first, InputIterator last) {
-               for (first; first != last; first++)
-                   insert (*first);
+				   while (first != last) {
+                	insert (*first);
+					first++;
+			   	}
             }
 
             void erase (iterator position) {
@@ -227,14 +255,14 @@ namespace ft {
             }
 
             void erase (iterator first, iterator last) {
-                for (first; first != last; first++) {
+                while (first != last) {
                     if (find(first._ptr->_value.first) != _end) {
-                        std::cout << "izzzz << "<<first._ptr->_value.first << std::endl;
                         del(first._ptr);
                         //_allocNode.destroy(first._ptr);
 			            //_allocNode.deallocate(first._ptr, 1);
                         this->_sizeMap--;
                         this->_root = getRoot(_root);
+						first++;
                     }
                 }
 
@@ -248,9 +276,6 @@ namespace ft {
             node	    *tmp;
 			size_type   size_tmp;
 
-			if (x == *this)
-				return ;
-
 			tmp = x._root;
 			x._root = _root;
 			_root = tmp;
@@ -259,11 +284,11 @@ namespace ft {
 			x._end = _end;
 			_end = tmp;
 
-			tmp = x._begin;
+			tmp = x._revBegin;
 			x._revBegin = _revBegin;
 			_revBegin = tmp;
 
-			size_tmp = x._size;
+			size_tmp = x._sizeMap;
 			x._sizeMap = _sizeMap;
 			_sizeMap = size_tmp;
         }
@@ -276,6 +301,7 @@ namespace ft {
 
         iterator find (const key_type& k) {
                 node *tmp = _root;
+
                 while (tmp != LEAF) {
                     if (_comp(tmp->_value.first, k))
                         tmp = tmp->_right;
@@ -284,6 +310,7 @@ namespace ft {
                     else
                         return iterator(tmp);
                 }
+
                 return iterator(_end);
             }
 
@@ -299,13 +326,13 @@ namespace ft {
             }
             return const_iterator(_end);
         }
-        
+
         pair<const_iterator,const_iterator> equal_range (const key_type& k) const {
             const_iterator first = lower_bound(k);
 			const_iterator second = upper_bound(k);
 			return (make_pair(first, second));
         }
-        
+
         pair<iterator,iterator> equal_range (const key_type& k) {
 	        iterator first = lower_bound(k);
 			iterator second = upper_bound(k);
@@ -320,7 +347,7 @@ namespace ft {
 			}
 			return (end());
         }
-        
+
         const_iterator lower_bound (const key_type& k) const {
             key_compare compare = key_compare();
 			for (const_iterator i = begin(); i != end(); i++) {
@@ -361,7 +388,7 @@ namespace ft {
             return (value_compare(_comp));
         }
 
-        private:    
+        private:
             node *del(node *delNode) {
                 node *x;
                 node *tmp = delNode;
@@ -436,7 +463,6 @@ namespace ft {
             }
 
             void reorganizeDelete(node *delNode) {
-                std::cout << " root = " << _root->_value.first << std::endl;
                 while (delNode != _root && delNode->color == BLACK) {
                     if (delNode == delNode->_parent->_left) {
                         node *y = delNode->_parent->_right;
@@ -464,7 +490,6 @@ namespace ft {
                             if (y && y->_right)
                                 y->_right->color = BLACK;
                             leftRotation(delNode->_parent);
-                    std::cout << "cc "  << std::endl;
                             break;
                         }
                     }
@@ -519,13 +544,13 @@ namespace ft {
         //         D = S->_left;
         //         C = S->_right;
         //         P->_right = LEAF;
-        //     }   
+        //     }
         //     do {
         //         dir = childDir(N);   // side of parent P on which node N is located
         //         S = P->child[1-dir]; // sibling of N (has black height >= 1)
         //         D = S->child[1-dir]; // distant nephew
         //         C = S->child[  dir]; // close   nephew
-                
+
         //         if (P->color == BLACK && C->color == BLACK && S->color == BLACK && D->color == BLACK) {
         //                 while ((P = N->_parent) != NULL) {
         //                     S->color = RED;
@@ -619,8 +644,12 @@ namespace ft {
             }
 
             int recursiveInsert(node *root, node *new_node) {
-                if (this->_root == NULL)
+                if (!_root) {
+                	new_node->_parent = NULL;
+                	new_node->_left = LEAF;
+                	new_node->_right = LEAF;
                     this->_root = new_node;
+				}
                 else if (root != NULL && _comp(new_node->_value.first, root->_value.first)) {
                     if (root->_left != LEAF) {
                         if (recursiveInsert(root->_left, new_node) == -1)
@@ -629,7 +658,7 @@ namespace ft {
                     }
                     else
                         root->_left = new_node;
-                } 
+                }
                 else if (root != NULL && _comp(root->_value.first, new_node->_value.first)) {
                     if (root->_right != LEAF) {
                         if (recursiveInsert(root->_right, new_node) == -1)
@@ -667,7 +696,7 @@ namespace ft {
             void changeColorFixTwo(node *new_node) {
                 ft_parent(new_node)->color = BLACK;
                 ft_oncle(new_node)->color = BLACK;
-                
+
                 node *grandparent = ft_grandparent(new_node);
                 grandparent->color = RED;
                 insertFixTree(grandparent);
@@ -683,7 +712,7 @@ namespace ft {
                 }
                 else if (grandparent->_right != NULL && new_node == grandparent->_right->_left) {
                     rightRotation(parent);
-                    new_node = new_node->_right; 
+                    new_node = new_node->_right;
                 }
                 rotationGparentFour(new_node);
             }
@@ -744,11 +773,11 @@ namespace ft {
                 y->_right = x;
                 x->_parent = y;
             }
-        
+
             node* getRoot(node *new_node) {
             node *root = new_node;
-            while (root->_parent != NULL)
-                root = root->_parent;
+            while (root && root->_parent)
+				root = root->_parent;
             return root;
         }
     };

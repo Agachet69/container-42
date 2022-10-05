@@ -6,7 +6,7 @@
 /*   By: agachet <agachet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/28 04:11:44 by agachet           #+#    #+#             */
-/*   Updated: 2022/09/28 04:11:44 by agachet          ###   ########.fr       */
+/*   Updated: 2022/10/05 19:53:47 by agachet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 template<class Pair>
 struct binarySearchTree {
     struct binarySearchTree *_left; //Pointeur vers fils gauche
-    struct binarySearchTree *_right; //Pointeur vers fils droit 
+    struct binarySearchTree *_right; //Pointeur vers fils droit
     struct binarySearchTree *_parent; //Pointeur vers père
     Pair _value; // Peut être n'importe quel type, tant que les opérations de comparaison (<, = , > ) sont définies
     int color; // ROUGE ou NOIR
@@ -32,7 +32,7 @@ struct binarySearchTree {
     binarySearchTree() : _left(LEAF), _right(LEAF), _parent(LEAF), _value() {}
 
     binarySearchTree(const Pair & val) : _left(LEAF), _right(LEAF), _parent(LEAF), _value(val) {}
-		
+
     binarySearchTree(const binarySearchTree &cpy) : _parent(cpy._parent), _left(cpy._left), _right(cpy._right), _value(cpy._value), color(cpy.color) {}
 
     ~binarySearchTree() {}
@@ -86,7 +86,9 @@ struct binarySearchTree {
             tmp = parent;
             parent = tmp->_parent;
         }
-        return parent;
+        if (parent)
+			return parent;
+		return _end;
     }
 };
 
