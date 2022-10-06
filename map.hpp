@@ -265,7 +265,6 @@ namespace ft {
 						first++;
                     }
                 }
-
             }
 
         void clear() {
@@ -457,8 +456,8 @@ namespace ft {
                     }
                     x = delNode->findMin(delNode->_right);
                 }
-                if (min->color == BLACK)
-                   reorganizeDelete(x);
+                //if (min->color == BLACK)
+                //   reorganizeDelete(x);
                 return min;
             }
 
