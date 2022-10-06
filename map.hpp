@@ -6,7 +6,7 @@
 /*   By: agachet <agachet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/24 18:16:44 by agachet           #+#    #+#             */
-/*   Updated: 2022/10/05 21:04:24 by agachet          ###   ########.fr       */
+/*   Updated: 2022/10/06 20:43:36 by agachet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -236,8 +236,8 @@ namespace ft {
                 if (find(position._ptr->_value.first) == _end)
                     return;
                 del(position._ptr);
-                _allocNode.destroy(position._ptr);
-			    _allocNode.deallocate(position._ptr, 1);
+                //_allocNode.destroy(position._ptr);
+			    //_allocNode.deallocate(position._ptr, 1);
                 this->_root = getRoot(_root);
                 this->_sizeMap--;
             }
@@ -247,8 +247,8 @@ namespace ft {
                 if (delNode == _end)
                     return 0;
                 del(delNode._ptr);
-                _allocNode.destroy(delNode._ptr);
-			    _allocNode.deallocate(delNode._ptr, 1);
+                //_allocNode.destroy(delNode._ptr);
+			    //_allocNode.deallocate(delNode._ptr, 1);
                 this->_sizeMap--;
                 this->_root = getRoot(_root);
                 return 1;
@@ -258,8 +258,8 @@ namespace ft {
                 while (first != last) {
                     if (find(first._ptr->_value.first) != _end) {
                         del(first._ptr);
-                        //_allocNode.destroy(first._ptr);
-			            //_allocNode.deallocate(first._ptr, 1);
+                        _allocNode.destroy(first._ptr);
+			            _allocNode.deallocate(first._ptr, 1);
                         this->_sizeMap--;
                         this->_root = getRoot(_root);
 						first++;
@@ -388,230 +388,151 @@ namespace ft {
         }
 
         private:
-            node *del(node *delNode) {
-                node *x;
-                node *tmp = delNode;
-                node *min;
-                int colorSupr = delNode->color;
+            void del(node *delNode) {
+				bool bothBlack = false;
+				node *replaceNode = findReplaceNode(delNode);
+				node *parent = delNode->_parent;
 
-                if (delNode->_left == LEAF && delNode->_right == LEAF) {
-                    if (delNode->_parent != LEAF && delNode == delNode->_parent->_right)
-                        delNode->_parent->_right = LEAF;
-                    else if (delNode->_parent != LEAF)
-                        delNode->_parent->_left = LEAF;
-                    else {
-                        _root = LEAF;
-                        return NULL;
-                    }
-                    x = delNode->_parent;
-                }
-                else if ((delNode->_left == LEAF && delNode->_right != LEAF) || (delNode->_left != LEAF && delNode->_right == LEAF)) {
-                    if (delNode->_right) {
-                        if (delNode->_parent) {
-                            delNode->_right->_parent = delNode->_parent;
-                            delNode->_parent = delNode->_right;
-                            x = delNode->_right;
-                        }
-                        else {
-                            _root = delNode->_right;
-                            delNode->_right->_parent = NULL;
-                            x = _root;
-                        }
-                    }
-                    else {
-                        if (delNode->_parent) {
-                            delNode->_left->_parent = delNode->_parent;
-                            delNode->_parent = delNode->_left;
-                            x = delNode->_left;
-                        }
-                        else {
-                            _root = delNode->_left;
-                            delNode->_left->_parent = NULL;
-                            x = _root;
-                        }
-                    }
-                }
-                else {
-                    min =  delNode->findMin(delNode->_right);
-                    x = min->_right;
-                    min->_left = delNode->_left;
-                    min->_left->_parent = min;
-                    if (min != delNode->_right) {
-                        min->_parent->_left = min->_right;
-                        if (min->_right)
-                            min->_right->_parent = min->_parent;
-                        delNode->_right->_parent = min;
-                        min->_right = delNode->_right;
-                    }
-                    if (delNode->_parent) {
-                        min->_parent = delNode->_parent;
-                        if (delNode->_parent->_right == delNode)
-                            delNode->_parent->_right = min;
-                        else
-                            delNode->_parent->_left = min;
-                    }
-                    else {
-                        min->_parent = NULL;
-                        _root = min;
-                    }
-                    x = delNode->findMin(delNode->_right);
-                }
-                //if (min->color == BLACK)
-                //   reorganizeDelete(x);
-                return min;
+				if ((replaceNode == LEAF || replaceNode->color == BLACK) && delNode->color == BLACK)
+					bothBlack = true;
+				if (!replaceNode) {
+					if (delNode == _root)
+						_root = NULL;
+					else {
+						if (bothBlack)
+							fixBothBlack(delNode);
+						else
+							if (ft_frere(delNode))
+								ft_frere(delNode)->color = RED;
+						if (delNode == delNode->_parent->_left)
+							delNode->_parent->_left = LEAF;
+						else
+							delNode->_parent->_right = LEAF;
+					}
+					return;
+				}
+				if ((!delNode->_left) || (!delNode->_right)) {
+					if (delNode == _root) {
+						replaceNode->_parent = NULL;
+						replaceNode->color = BLACK;
+						_root = replaceNode;
+					}
+					else {
+						if (delNode->_parent->_left == delNode)
+							parent->_left = replaceNode;
+						else
+							parent->_right = replaceNode;
+						replaceNode->_parent = parent;
+						if (bothBlack)
+							fixBothBlack(replaceNode);
+						else
+							replaceNode->color = BLACK;
+					}
+					return;
+				}
+				value_type tmp = replaceNode->_value;
+				/*node *newReplace*/ replaceNode = swapValue(replaceNode, delNode->_value);
+				/*node *newDelNode*/ delNode = swapValue(delNode, tmp);
+				del(replaceNode);
             }
 
-            void reorganizeDelete(node *delNode) {
-                while (delNode != _root && delNode->color == BLACK) {
-                    if (delNode == delNode->_parent->_left) {
-                        node *y = delNode->_parent->_right;
-                        if (y && y->color == RED) {
-                            y->color = BLACK;
-                            delNode->_parent->color = RED;
-                            leftRotation(delNode->_parent);
-                            y = delNode->_parent->_right;
-                        }
-                        if (y && y->_left && y->_left->color == BLACK && y->_right && y->_right->color == BLACK) {
-                            y->color = RED;
-                            delNode = delNode->_parent;
-                        }
-                        else {
-                            if (y && y->_right && y->_right->color == BLACK) {
-                                if (y->_left)
-                                    y->_left->color = BLACK;
-                                y->color = RED;
-                                rightRotation(y);
-                                y = delNode->_parent->_right;
-                            }
-                            if (y)
-                                y->color = delNode->_parent->color;
-                            delNode->_parent->color = BLACK;
-                            if (y && y->_right)
-                                y->_right->color = BLACK;
-                            leftRotation(delNode->_parent);
-                            break;
-                        }
-                    }
-                    else {
-                        node *y = delNode->_parent->_left;
-                        if (y && y->color == RED ) {
-                            y->color = BLACK;
-                            delNode->_parent->color = RED;
-                            rightRotation(delNode->_parent);
-                            y = delNode->_parent->_left;
-                        }
-                        if (y && y->_right && y->_right->color == BLACK && y->_left && y->_left->color == BLACK) {
-                            y->color = RED;
-                            delNode = delNode->_parent;
-                        }
-                        else {
-                            if (y && y->_left && y->_left->color == BLACK) {
-                                if (y->_right)
-                                    y->_right->color = BLACK;
-                                y->color = RED;
-                                leftRotation(y);
-                                y = delNode->_parent->_left;
-                            }
-                            y->color = delNode->_parent->color;
-                            delNode->_parent->color = BLACK;
-                            if (y && y->_left)
-                                y->_left->color = BLACK;
-                            rightRotation(delNode->_parent);
-                            break;
-                        }
-                    }
-                }
-                delNode->color = BLACK;
-            }
+			node *findReplaceNode(node *delNode) {
+				if (delNode->_right && delNode->_left)
+					return findSuccesor(delNode->_right);
+				else if (delNode->_right == LEAF && delNode->_left == LEAF)
+					return NULL;
+				else if (delNode->_right)
+					return delNode->_right;
+				else
+					return delNode->_left;
+			}
 
-        // void RBdelete2(node * N) {  // -> node to be deleted
-        //     int dir; // side of P on which N is located (∈ { LEFT, RIGHT })
-        //     node* S; // -> sibling of N
-        //     node* P = N->_parent;  // -> parent node of N
-        //     node* C;  // -> close   nephew
-        //     node* D;  // -> distant nephew
-        //     if (N == P->_left) {
-        //         dir = 0;
-        //         S = P->_right;
-        //         D = S->_right;
-        //         C = S->_left;
-        //         P->_left = LEAF;
-        //     }
-        //     else {
-        //         dir = 1;
-        //         S = P->_left;
-        //         D = S->_left;
-        //         C = S->_right;
-        //         P->_right = LEAF;
-        //     }
-        //     do {
-        //         dir = childDir(N);   // side of parent P on which node N is located
-        //         S = P->child[1-dir]; // sibling of N (has black height >= 1)
-        //         D = S->child[1-dir]; // distant nephew
-        //         C = S->child[  dir]; // close   nephew
+			node *findSuccesor(node *x) {
+				node *tmp = x;
 
-        //         if (P->color == BLACK && C->color == BLACK && S->color == BLACK && D->color == BLACK) {
-        //                 while ((P = N->_parent) != NULL) {
-        //                     S->color = RED;
-        //                     N = P;
-        //                 }
-        //         }
-        //         else if (P == NULL)
-        //             return;
-        //         else if (S->color == RED) {
-        //             RotateDirRoot(T,P,dir); // P may be the root
-        //             P->color = RED;
-        //             S->color = BLACK;
-        //             S = C; // != NIL
-        //             // now: P red && S black
-        //             D = S->child[1-dir]; // distant nephew
-        //             if (D != LEAF && D->color == RED)
-        //                 goto Case_D6;      // D red && S black
-        //             C = S->child[  dir]; // close   nephew
-        //             if (C != LEAF && C->color == RED)
-        //                 goto Case_D5;      // C red && S+D black
-        //             // Otherwise C+D considered black.
-        //             // fall through to Case_D4
-        //         }
-        //         // S is black:
-        //         else if (D != LEAF && D->color == RED) { // not considered black
-        //             RotateDirRoot(T,P,dir); // P may be the root
-        //             S->color = P->color;
-        //             P->color = BLACK;
-        //             D->color = BLACK;
-        //             return;
-        //         }
-        //         else if (C != LEAF && C->color == RED)  {// not considered black
-        //             RotateDirRoot(T,S,1-dir); // S is never the root
-        //             S->color = RED;
-        //             C->color = BLACK;
-        //             D = S;
-        //             S = C;
-        //         }
-        //         // Here both nephews are == NIL (first iteration) or black (later).
-        //         else if (P->color == RED) {
-        //             S->color = RED;
-        //             P->color = BLACK;
-        //             return;
-        //         }
-        //     }
-        // }
+				while (tmp->_left)
+					tmp = tmp->_left;
+				return tmp;
+			}
 
-        // node* RotateDirRoot(RBtree* T,   /* red–black tree*/RBnode* P,   /* root of subtree (may be the root of T)*/int dir) {   // dir ∈ { LEFT, RIGHT }
-        // RBnode* G = P->parent;
-        // RBnode* S = P->child[1-dir];
-        // RBnode* C;
-        // assert(S != NIL); // pointer to true node required
-        // C = S->child[dir];
-        // P->child[1-dir] = C; if (C != NIL) C->parent = P;
-        // S->child[  dir] = P; P->parent = S;
-        // S->parent = G;
-        // if (G != NULL)
-        //     G->child[ P == G->right ? RIGHT : LEFT ] = S;
-        // else
-        //     _root = S;
-        // return S; // new root of subtree
-        // }
+			void fixBothBlack(node *xNode) {
+				if (xNode == _root)
+					return;
+				node *brother = ft_frere(xNode);
+				node *parent = ft_parent(xNode);
+				if (!brother)
+					fixBothBlack(parent);
+				else {
+					if (brother->color == RED) {
+						brother->color = BLACK;
+						parent->color = RED;
+						if (brother->_parent->_left == brother)
+							rightRotation(parent);
+						else
+							leftRotation(parent);
+						fixBothBlack(xNode);
+					}
+					else {
+						if ((brother->_left && brother->_left->color == RED) || (brother->_right && brother->_right->color == RED)) {
+							if (brother->_left && brother->_left->color == RED) {
+								if (brother->_parent->_left == brother) {
+									brother->_left->color = brother->color;
+									brother->color = parent->color;
+									rightRotation(parent);
+								}
+								else {
+									brother->_left->color = parent->color;
+									rightRotation(brother);
+									leftRotation(parent);
+								}
+							}
+							else {
+								if (brother->_parent->_left == brother) {
+									brother->_right->color = parent->color;
+									leftRotation(brother);
+									rightRotation(parent);
+								}
+								else {
+									brother->_right->color = brother->color;
+									brother->color = parent->color;
+									leftRotation(parent);
+								}
+							}
+							parent->color = BLACK;
+						}
+						else {
+							brother->color = RED;
+							if (parent->color == BLACK)
+								fixBothBlack(parent);
+							else
+								parent->color = BLACK;
+
+						}
+					}
+				}
+			}
+
+			node *swapValue(node *first, value_type value) {
+				node *newFirst = _allocNode.allocate(1);
+				_allocNode.construct(newFirst, node(value));
+				newFirst->color = first->color;
+				newFirst->_left = first->_left;
+				newFirst->_right = first->_right;
+				newFirst->_parent = first->_parent;
+				if (newFirst->_left)
+					newFirst->_left->_parent = newFirst;
+				if (newFirst->_right)
+					newFirst->_right->_parent = newFirst;
+				if (first->_parent) {
+					if (first == first->_parent->_left)
+						first->_parent->_left = newFirst;
+					else
+						first->_parent->_right = newFirst;
+				}
+				_allocNode.destroy(first);
+			    _allocNode.deallocate(first, 1);
+				return newFirst;
+			}
 
             node* ft_parent(node* n) {
                 return n->_parent;
@@ -730,12 +651,10 @@ namespace ft {
 
             void leftRotation(node* x) {
                 node* y = x->_right;
-                //le fils droit de x devient le fils gauche de y
                 x->_right = y->_left;
                 if (y->_left != LEAF)
                     y->_left->_parent = x;
                 y->_parent = x->_parent;
-                //Si x est la racine, y devient la racine
                 if (x->_parent == NULL) {
                     node *tmp = x;
                     x = y;
@@ -743,39 +662,33 @@ namespace ft {
                     tmp->_parent = x;
                     return;
                 }
-                //Sinon, on remplace x par y
                 else if (x == x->_parent->_left)
                     x->_parent->_left = y;
                 else
                     x->_parent->_right = y;
-                //On attache x à gauche de y
                 y->_left = x;
                 x->_parent = y;
             }
 
             void rightRotation(node* x) {
                 node* y = x->_left;
-                //le fils gauche de x devient le fils droit de y
                 x->_left = y->_right;
                 if (y->_right != LEAF)
                     y->_right->_parent = x;
                 y->_parent = x->_parent;
-                //Si x est la racine, y devient la racine
                 if (x->_parent == NULL)
                     x = y;
-                //Sinon, on remplace x par y
                 else if (x == x->_parent->_right)
                     x->_parent->_right = y;
                 else
                     x->_parent->_left = y;
-                //On attache x à droite de y
                 y->_right = x;
                 x->_parent = y;
             }
 
             node* getRoot(node *new_node) {
             node *root = new_node;
-            while (root && root->_parent)
+			while (root && root->_parent)
 				root = root->_parent;
             return root;
         }

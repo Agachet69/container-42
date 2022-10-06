@@ -6,7 +6,7 @@
 /*   By: agachet <agachet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 22:59:55 by agachet           #+#    #+#             */
-/*   Updated: 2022/10/05 21:08:59 by agachet          ###   ########.fr       */
+/*   Updated: 2022/10/06 20:04:50 by agachet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -688,10 +688,10 @@ int main() {
         mymap['f']=60;
         it=mymap.find('b');
         mymap.erase (it);                   // erasing by iterator
-        mymap.erase ('c');                  // erasing by key
-        it=mymap.find ('e');
-        ft::map<char,int>::iterator it2 = mymap.find ('d');
-        mymap.erase ( it, it2 );    // erasing by range
+        //mymap.erase ('c');                  // erasing by key
+        //it=mymap.find ('e');
+        //ft::map<char,int>::iterator it2 = mymap.find ('d');
+        //mymap.erase ( it, it2 );    // erasing by range
         // show content:
         for (it=mymap.begin(); it!=mymap.end(); ++it)
             std::cout << it->first << " => " << it->second << '\n';
