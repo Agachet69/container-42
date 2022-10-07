@@ -101,20 +101,20 @@ namespace ft {
                 _revBegin->_end = _end;
                 _revBegin->_parent = _end;
                 _root = NULL;
-    			clear(); /* verif */
+    			clear();
     			this->insert(x.begin(), x.end());
             }
 
-            //~map() {
-            //    clear();
-			//    _allocNode.destroy(_end);
-			//    _allocNode.deallocate(_end, 1);
-			//    _allocNode.destroy(_revBegin);
-			//    _allocNode.deallocate(_revBegin, 1);
-            //}
+            ~map() {
+               clear();
+			  _allocNode.destroy(_end);
+			  _allocNode.deallocate(_end, 1);
+			  _allocNode.destroy(_revBegin);
+			  _allocNode.deallocate(_revBegin, 1);
+            }
 
             map& operator= (const map& x) {
-				//clear(); a verif
+				clear();
                 _comp = x._comp;
                 _sizeMap = 0;
                 _allocPair = x._allocPair;
@@ -238,7 +238,6 @@ namespace ft {
                 del(position._ptr);
                 //_allocNode.destroy(position._ptr);
 			    //_allocNode.deallocate(position._ptr, 1);
-                this->_root = getRoot(_root);
                 this->_sizeMap--;
             }
 
@@ -250,21 +249,29 @@ namespace ft {
                 //_allocNode.destroy(delNode._ptr);
 			    //_allocNode.deallocate(delNode._ptr, 1);
                 this->_sizeMap--;
-                this->_root = getRoot(_root);
                 return 1;
             }
 
             void erase (iterator first, iterator last) {
+                iterator tpmFirst = first;
+                int i;
+                iterator delNode;
+                
                 while (first != last) {
-                    if (find(first._ptr->_value.first) != _end) {
-                        del(first._ptr);
-                        _allocNode.destroy(first._ptr);
-			            _allocNode.deallocate(first._ptr, 1);
-                        this->_sizeMap--;
-                        this->_root = getRoot(_root);
-						first++;
-                    }
+                    first++;
+                    i++;
                 }
+                key_type *pch = new key_type[i];
+                for (i = 0; tpmFirst != last; i++) {
+                    pch[i] = tpmFirst._ptr->_value.first;
+			 	    tpmFirst++;
+                }
+                for (int j = 0; j < i; j++) {
+                    delNode = find(pch[j]);
+                    if (delNode != _end)
+                        del(delNode._ptr);
+                }
+                delete [] pch;
             }
 
         void clear() {
@@ -301,15 +308,19 @@ namespace ft {
         iterator find (const key_type& k) {
                 node *tmp = _root;
 
-                while (tmp != LEAF) {
-                    if (_comp(tmp->_value.first, k))
-                        tmp = tmp->_right;
-                    else if (_comp(k, tmp->_value.first))
-                        tmp = tmp->_left;
-                    else
-                        return iterator(tmp);
+                for (iterator it=this->begin(); it!=this->end(); ++it) {
+                    if (it->first == k)
+                        return it;
                 }
 
+                // while (tmp) {
+                //     if (_comp(tmp->_value.first, k))
+                //         tmp = tmp->_right;
+                //     else if (_comp(k, tmp->_value.first))
+                //         tmp = tmp->_left;
+                //     else
+                //         return iterator(tmp);
+                // }
                 return iterator(_end);
             }
 
@@ -396,8 +407,9 @@ namespace ft {
 				if ((replaceNode == LEAF || replaceNode->color == BLACK) && delNode->color == BLACK)
 					bothBlack = true;
 				if (!replaceNode) {
-					if (delNode == _root)
+					if (delNode == _root) {
 						_root = NULL;
+                    }
 					else {
 						if (bothBlack)
 							fixBothBlack(delNode);
@@ -431,9 +443,48 @@ namespace ft {
 					return;
 				}
 				value_type tmp = replaceNode->_value;
-				/*node *newReplace*/ replaceNode = swapValue(replaceNode, delNode->_value);
-				/*node *newDelNode*/ delNode = swapValue(delNode, tmp);
+				node *oldReplace = replaceNode; 
+				node *oldDelNode = delNode;
+                replaceNode = swapValue(replaceNode, delNode->_value);
+                delNode = swapValue(delNode, tmp);
+                if (oldDelNode == _root)
+                    _root = delNode;
 				del(replaceNode);
+            }
+
+            void leftRotateErase(node *x) {
+                node *nParent = x->_right;
+                if (x == _root)
+                    _root = nParent;
+                moveDown(x, nParent);
+                x->_right = nParent->_left;
+                if (nParent->_left != NULL)
+                    nParent->_left->_parent = x;
+                nParent->_left = x;
+            }
+            
+            void rightRotateErase(node *x) {
+                node *nParent = x->_left;
+                if (x == _root)
+                    _root = nParent;
+                moveDown(x, nParent);
+                x->_left = nParent->_right;
+                if (nParent->_right != NULL)
+                    nParent->_right->_parent = x;
+                nParent->_right = x;
+            }
+
+            void moveDown(node *x, node *nParent) {
+                if (x->_parent != NULL) {
+                    if (x == x->_parent->_left) {
+                        x->_parent->_left = nParent;
+                    } 
+                    else {
+                        x->_parent->_right = nParent;
+                    }
+                }
+                nParent->_parent = x->_parent;
+                x->_parent = nParent;
             }
 
 			node *findReplaceNode(node *delNode) {
@@ -467,9 +518,9 @@ namespace ft {
 						brother->color = BLACK;
 						parent->color = RED;
 						if (brother->_parent->_left == brother)
-							rightRotation(parent);
+							rightRotateErase(parent);
 						else
-							leftRotation(parent);
+							leftRotateErase(parent);
 						fixBothBlack(xNode);
 					}
 					else {
@@ -478,24 +529,24 @@ namespace ft {
 								if (brother->_parent->_left == brother) {
 									brother->_left->color = brother->color;
 									brother->color = parent->color;
-									rightRotation(parent);
+									rightRotateErase(parent);
 								}
 								else {
 									brother->_left->color = parent->color;
-									rightRotation(brother);
-									leftRotation(parent);
+									rightRotateErase(brother);
+									leftRotateErase(parent);
 								}
 							}
 							else {
 								if (brother->_parent->_left == brother) {
 									brother->_right->color = parent->color;
-									leftRotation(brother);
-									rightRotation(parent);
+									leftRotateErase(brother);
+									rightRotateErase(parent);
 								}
 								else {
 									brother->_right->color = brother->color;
 									brother->color = parent->color;
-									leftRotation(parent);
+									leftRotateErase(parent);
 								}
 							}
 							parent->color = BLACK;
@@ -519,6 +570,7 @@ namespace ft {
 				newFirst->_left = first->_left;
 				newFirst->_right = first->_right;
 				newFirst->_parent = first->_parent;
+                newFirst->_end = _end;
 				if (newFirst->_left)
 					newFirst->_left->_parent = newFirst;
 				if (newFirst->_right)
@@ -529,8 +581,8 @@ namespace ft {
 					else
 						first->_parent->_right = newFirst;
 				}
-				_allocNode.destroy(first);
-			    _allocNode.deallocate(first, 1);
+				//_allocNode.destroy(first);
+			    //_allocNode.deallocate(first, 1);
 				return newFirst;
 			}
 

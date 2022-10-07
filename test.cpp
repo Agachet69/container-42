@@ -23,15 +23,22 @@
 
 int main() {
 
-   std::map<char,int> mymap;
-
-  mymap['x'] = 100;
-  mymap['y'] = 200;
-  mymap['z'] = 300;
-
-  // show content:
-  std::map<char,int>::reverse_iterator rit;
-  for (rit=mymap.rbegin(); rit!=mymap.rend(); ++rit)
-    std::cout << rit->first << " => " << rit->second << '\n';
-  return 0;
+        std::map<char,int> mymap;
+      std::map<char,int>::iterator it;
+        // insert some values:
+        mymap['a']=10;
+        mymap['b']=20;
+        mymap['c']=30;
+        mymap['d']=40;
+        mymap['e']=50;
+        mymap['f']=60;
+        it=mymap.find('b');
+        mymap.erase (it);                   // erasing by iterator
+        mymap.erase ('c');                  // erasing by key
+        it=mymap.find ('e');
+      std::map<char,int>::iterator it2 = mymap.find ('d');
+        mymap.erase ( it, it2 );    // erasing by range
+        // show content:
+        for (it=mymap.begin(); it!=mymap.end(); ++it)
+            std::cout << it->first << " => " << it->second << '\n';
 }
