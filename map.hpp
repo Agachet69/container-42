@@ -163,7 +163,6 @@ namespace ft {
         	        tmp = tmp->_right;
         	    }
         	    return reverse_iterator(tmp);
-			    // return (reverse_iterator(_end));
 		    }
 
             const_reverse_iterator rbegin() const {
@@ -256,7 +255,7 @@ namespace ft {
                 iterator tpmFirst = first;
                 int i;
                 iterator delNode;
-                
+
                 while (first != last) {
                     first++;
                     i++;
@@ -264,7 +263,7 @@ namespace ft {
                 key_type *pch = new key_type[i];
                 for (i = 0; tpmFirst != last; i++) {
                     pch[i] = tpmFirst._ptr->_value.first;
-			 	    tpmFirst++;
+	    	 	    tpmFirst++;
                 }
                 for (int j = 0; j < i; j++) {
                     delNode = find(pch[j]);
@@ -274,129 +273,117 @@ namespace ft {
                 delete [] pch;
             }
 
-        void clear() {
-            this->erase(this->begin(), this->end());
-        }
-
-        void swap (map& x) {
-            node	    *tmp;
-			size_type   size_tmp;
-
-			tmp = x._root;
-			x._root = _root;
-			_root = tmp;
-
-			tmp = x._end;
-			x._end = _end;
-			_end = tmp;
-
-			tmp = x._revBegin;
-			x._revBegin = _revBegin;
-			_revBegin = tmp;
-
-			size_tmp = x._sizeMap;
-			x._sizeMap = _sizeMap;
-			_sizeMap = size_tmp;
-        }
-
-        size_type count (const key_type& k) const {
-                if ((find(k)) == iterator(_end))
-                    return 0;
-                return 1;
+            void clear() {
+                this->erase(this->begin(), this->end());
             }
 
-        iterator find (const key_type& k) {
+            void swap (map& x) {
+                node	    *tmp;
+			    size_type   size_tmp;
+
+			    tmp = x._root;
+			    x._root = _root;
+			    _root = tmp;
+			    tmp = x._end;
+			    x._end = _end;
+			    _end = tmp;
+			    tmp = x._revBegin;
+			    x._revBegin = _revBegin;
+			    _revBegin = tmp;
+			    size_tmp = x._sizeMap;
+			    x._sizeMap = _sizeMap;
+			    _sizeMap = size_tmp;
+            }
+
+            size_type count (const key_type& k) const {
+                    if ((find(k)) == iterator(_end))
+                        return 0;
+                    return 1;
+                }
+
+            iterator find (const key_type& k) {
                 node *tmp = _root;
 
                 for (iterator it=this->begin(); it!=this->end(); ++it) {
                     if (it->first == k)
                         return it;
                 }
-
-                // while (tmp) {
-                //     if (_comp(tmp->_value.first, k))
-                //         tmp = tmp->_right;
-                //     else if (_comp(k, tmp->_value.first))
-                //         tmp = tmp->_left;
-                //     else
-                //         return iterator(tmp);
-                // }
                 return iterator(_end);
             }
 
-        const_iterator find (const key_type& k) const {
-            node *tmp = _root;
-            while (tmp != LEAF) {
-                if (_comp(tmp->_value.first, k))
-                    tmp = tmp->_right;
-                else if (_comp(k, tmp->_value.first))
-                    tmp = tmp->_left;
-                else
-                    return const_iterator(tmp);
+            const_iterator find (const key_type& k) const {
+                node *tmp = _root;
+                while (tmp != LEAF) {
+                    if (_comp(tmp->_value.first, k))
+                        tmp = tmp->_right;
+                    else if (_comp(k, tmp->_value.first))
+                        tmp = tmp->_left;
+                    else
+                        return const_iterator(tmp);
+                }
+                return const_iterator(_end);
             }
-            return const_iterator(_end);
-        }
 
-        pair<const_iterator,const_iterator> equal_range (const key_type& k) const {
-            const_iterator first = lower_bound(k);
-			const_iterator second = upper_bound(k);
-			return (make_pair(first, second));
-        }
+            pair<const_iterator,const_iterator> equal_range (const key_type& k) const {
+                const_iterator first = lower_bound(k);
+		    	const_iterator second = upper_bound(k);
+		    	return (make_pair(first, second));
+            }
 
-        pair<iterator,iterator> equal_range (const key_type& k) {
-	        iterator first = lower_bound(k);
-			iterator second = upper_bound(k);
-			return (make_pair(first, second));
-        }
+            pair<iterator,iterator> equal_range (const key_type& k) {
+	            iterator first = lower_bound(k);
+		    	iterator second = upper_bound(k);
+		    	return (make_pair(first, second));
+            }
 
-        iterator lower_bound (const key_type& k) {
-            key_compare compare = key_compare();
-			for (iterator i = begin(); i != end(); i++) {
-				if (!compare(i->first, k))
-					return (i);
-			}
-			return (end());
-        }
+            iterator lower_bound (const key_type& k) {
+                key_compare compare = key_compare();
+		    	for (iterator i = begin(); i != end(); i++) {
+		    		if (!compare(i->first, k))
+		    			return (i);
+		    	}
+		    	return (end());
+            }
 
-        const_iterator lower_bound (const key_type& k) const {
-            key_compare compare = key_compare();
-			for (const_iterator i = begin(); i != end(); i++) {
-				if (!compare(i->first, k))
-					return (i);
-			}
-			return (end());
-        }
+            const_iterator lower_bound (const key_type& k) const {
+                key_compare compare = key_compare();
+		    	for (const_iterator i = begin(); i != end(); i++) {
+		    		if (!compare(i->first, k))
+		    			return (i);
+		    	}
+		    	return (end());
+            }
 
-        iterator upper_bound (const key_type& k) {
-			key_compare compare = key_compare();
-			for (iterator i = begin(); i != end(); i++) {
-				if (compare(k, i->first))
-					return (i);
-			}
-			return (end());
-		}
+            iterator upper_bound (const key_type& k) {
+		    	key_compare compare = key_compare();
+		    	for (iterator i = begin(); i != end(); i++) {
+		    		if (compare(k, i->first))
+		    			return (i);
+		    	}
+		    	return (end());
+		    }
 
-		const_iterator upper_bound (const key_type& k) const {
-			key_compare compare = key_compare();
-			for (const_iterator i = begin(); i != end(); i++) {
-				if (compare(k, i->first))
-					return (i);
-			}
-			return (end());
-		}
+		    const_iterator upper_bound (const key_type& k) const {
+		    	key_compare compare = key_compare();
+		    	for (const_iterator i = begin(); i != end(); i++) {
+		    		if (compare(k, i->first))
+		    			return (i);
+		    	}
+		    	return (end());
+		    }
 
-        allocator_type get_allocator() const {
-            allocator_type allocator_copy(_allocPair);
-			return (allocator_copy);
-        }
+            allocator_type get_allocator() const {
+                allocator_type allocator_copy(_allocPair);
+		    	return (allocator_copy);
+            }
 
-        key_compare key_comp() const {
-            return (key_compare(_comp));
-        }
+            key_compare key_comp() const {
+                return (key_compare(_comp));
+            }
 
-        value_compare value_comp() const {
-            return (value_compare(_comp));
-        }
+            value_compare value_comp() const {
+                return (value_compare(_comp));
+            }
 
         private:
             void del(node *delNode) {
@@ -600,7 +587,7 @@ namespace ft {
             node* ft_frere(node* n) {
                 node* parent = ft_parent(n);
                 if (parent == NULL)
-                    return NULL; // Un noeud sans parent n'a pas de frere
+                    return NULL;
                 if (n == parent->_left)
                     return parent->_right;
                 else
@@ -611,7 +598,7 @@ namespace ft {
                 node* parent = ft_parent(son);
                 node* grandparent = ft_grandparent(son);
                 if (grandparent == NULL)
-                    return NULL; // Pas de grand parent, donc pas d'oncle
+                    return NULL;
                 return ft_frere(parent);
             }
 
@@ -745,7 +732,6 @@ namespace ft {
             return root;
         }
     };
-}
 
     template<class Key, class T, class Compare, class Alloc>
 	bool operator==(const ft::map<Key,T,Compare,Alloc> &lhs, const ft::map<Key,T,Compare,Alloc> &rhs) {
@@ -791,5 +777,6 @@ namespace ft {
 	void swap(ft::map<Key,T,Compare,Alloc> &lhs, ft::map<Key,T,Compare,Alloc> &rhs) {
 		return lhs.swap(rhs);
 	}
+}
 
 #endif
