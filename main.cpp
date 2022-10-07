@@ -20,6 +20,7 @@
 #include "map.hpp"
 #include "pair.hpp"
 
+
 template<typename Key, typename Value>
 std::ostream& operator<<(std::ostream& os, ft::map<Key, Value> const& m)
 {
@@ -693,21 +694,21 @@ int main() {
 	//	std::cout << it->first << " => " << it->second << '\n';
 
     /*                                                      ft::map::erase                                                     */
-        // ft::map<char,int> mymap;
-        // ft::map<char,int>::iterator it;
-        // mymap['a']=10;
-        // mymap['b']=20;
-        // mymap['c']=30;
-        // mymap['d']=40;
-        // mymap['e']=50;
-        // mymap['f']=60;
-        // it=mymap.find('b');
-        // mymap.erase (it);                   // erasing by iterator
-        // mymap.erase ('c');                  // erasing by key
-        // it=mymap.find ('e');
-        // mymap.erase ( it, mymap.end() );    // erasing by range
-        // for (it=mymap.begin(); it!=mymap.end(); ++it)
-        //     std::cout << it->first << " => " << it->second << '\n';
+        ft::map<char,int> mymap;
+        ft::map<char,int>::iterator it;
+        mymap['a']=10;
+        mymap['b']=20;
+        mymap['c']=30;
+        mymap['d']=40;
+        mymap['e']=50;
+        mymap['f']=60;
+        it=mymap.find('b');
+        mymap.erase (it);                   // erasing by iterator
+        mymap.erase ('c');                  // erasing by key
+        it=mymap.find ('e');
+        mymap.erase ( it, mymap.end() );    // erasing by range
+        for (it=mymap.begin(); it!=mymap.end(); ++it)
+            std::cout << it->first << " => " << it->second << '\n';
 
     /*                                                      ft::map::clear                                                     */
 
@@ -841,7 +842,6 @@ int main() {
         // do {
         //     std::cout << it->first << " => " << it->second << '\n';
         // } while ( mymap.value_comp()(*it++, highest) );
-
 
     return 0;
 };

@@ -408,7 +408,9 @@ namespace ft {
 						else
 							delNode->_parent->_right = LEAF;
 					}
-					return;
+					_allocNode.destroy(delNode);
+			        _allocNode.deallocate(delNode, 1);
+                    return;
 				}
 				if ((!delNode->_left) || (!delNode->_right)) {
 					if (delNode == _root) {
@@ -427,6 +429,8 @@ namespace ft {
 						else
 							replaceNode->color = BLACK;
 					}
+                    _allocNode.destroy(delNode);
+			        _allocNode.deallocate(delNode, 1);
 					return;
 				}
 				value_type tmp = replaceNode->_value;
@@ -568,8 +572,8 @@ namespace ft {
 					else
 						first->_parent->_right = newFirst;
 				}
-				//_allocNode.destroy(first);
-			    //_allocNode.deallocate(first, 1);
+				_allocNode.destroy(first);
+			    _allocNode.deallocate(first, 1);
 				return newFirst;
 			}
 
