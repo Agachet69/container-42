@@ -147,7 +147,8 @@ namespace ft {
             for (i = 0; i < n; i++)
                 this->_array[i] = val;
             this->_array[i] = NULL;
-            delete [] tmp;
+            _myAlloc.destroy(tmp);
+            _myAlloc.deallocate(tmp, n);
         }
 
         size_type capacity() const {
@@ -157,8 +158,6 @@ namespace ft {
         void reserve (size_type n) {
             pointer tmp = _myAlloc.allocate(n);
 
-      //      if (n > this->max_size())
-       //         throw length_error("msg");
             if (n > this->_capacity) {
                 this->_capacity = n;
                 for (size_t i = 0; i < this->_vecSize; i++)
@@ -167,7 +166,8 @@ namespace ft {
                 for (size_t i = 0; i < this->_vecSize; i++)
                     this->_array[i] = tmp[i];
             }
-            delete [] tmp;
+            _myAlloc.destroy(tmp);
+            _myAlloc.deallocate(tmp, n);
         }
 
         reference front() {
@@ -303,7 +303,8 @@ namespace ft {
                 j++;
             }
             this->_vecSize--;
-            delete [] tmp;
+            _myAlloc.destroy(tmp);
+            _myAlloc.deallocate(tmp, _capacity);
             return this->_array[pos];
         }
 
@@ -323,12 +324,14 @@ namespace ft {
                 j++;
             }
             this->_vecSize -= (posLast - posFirst);
-            delete [] tmp;
-            //return this->_array[pos];
+            _myAlloc.destroy(tmp);
+            _myAlloc.deallocate(tmp, _capacity);
+            return this->_array[pos];
         }
 
         void push_back (const value_type& val) {
             pointer tmp = _myAlloc.allocate(this->_capacity);
+            size_type tmpSize = this->_capacity;
 
             if (this->_vecSize + 1 > this->_capacity) {
                 for (size_t i = 0; i < this->_vecSize; i++)
@@ -346,7 +349,8 @@ namespace ft {
             }
             this->_array[_vecSize] = val;
             this->_vecSize++;
-            delete [] tmp;
+            _myAlloc.destroy(tmp);
+            _myAlloc.deallocate(tmp, tmpSize);
         }
 
         void pop_back() {

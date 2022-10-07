@@ -106,11 +106,11 @@ namespace ft {
             }
 
             ~map() {
-               clear();
-			  _allocNode.destroy(_end);
-			  _allocNode.deallocate(_end, 1);
-			  _allocNode.destroy(_revBegin);
-			  _allocNode.deallocate(_revBegin, 1);
+                clear();
+			    _allocNode.destroy(_end);
+			    _allocNode.deallocate(_end, 1);
+			    _allocNode.destroy(_revBegin);
+			    _allocNode.deallocate(_revBegin, 1);
             }
 
             map& operator= (const map& x) {
@@ -235,8 +235,6 @@ namespace ft {
                 if (find(position._ptr->_value.first) == _end)
                     return;
                 del(position._ptr);
-                //_allocNode.destroy(position._ptr);
-			    //_allocNode.deallocate(position._ptr, 1);
                 this->_sizeMap--;
             }
 
@@ -245,8 +243,6 @@ namespace ft {
                 if (delNode == _end)
                     return 0;
                 del(delNode._ptr);
-                //_allocNode.destroy(delNode._ptr);
-			    //_allocNode.deallocate(delNode._ptr, 1);
                 this->_sizeMap--;
                 return 1;
             }
@@ -267,8 +263,10 @@ namespace ft {
                 }
                 for (int j = 0; j < i; j++) {
                     delNode = find(pch[j]);
-                    if (delNode != _end)
+                    if (delNode != _end) {
                         del(delNode._ptr);
+                        this->_sizeMap--;
+                    }
                 }
                 delete [] pch;
             }
@@ -299,7 +297,7 @@ namespace ft {
                     if ((find(k)) == iterator(_end))
                         return 0;
                     return 1;
-                }
+            }
 
             iterator find (const key_type& k) {
                 node *tmp = _root;
