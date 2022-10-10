@@ -6,7 +6,7 @@
 /*   By: agachet <agachet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/10 17:50:06 by agachet           #+#    #+#             */
-/*   Updated: 2022/10/05 16:18:06 by agachet          ###   ########.fr       */
+/*   Updated: 2022/10/10 18:47:06 by agachet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,22 +69,26 @@ namespace ft {
         }
 
         ~vector() {
-            _myAlloc.destroy(_array);
-            _myAlloc.deallocate(_array, _vecSize);
+            if (_capacity > 0) {
+				_myAlloc.destroy(_array);
+				_myAlloc.deallocate(_array, _capacity);
+			}
         }
 
         vector& operator= (const vector& x) {
-            _myAlloc.destroy(_array);
-            _myAlloc.deallocate(_array, _vecSize);
-            _array = _myAlloc.allocate(x.size());
-            _vecSize = x._vecSize;
-            _capacity = x._vecSize;
-            for (unsigned int i = 0; i < _vecSize; i++)
-                _array[i] = x._array[i];
-        }
+          	this->clear();
+		   	if (this->capacity() < x.size())
+			   	this->reserve(x.size());
+			_myAlloc.deallocate(_array, _capacity);
+			_array = _myAlloc.allocate(x._capacity);
+            for (size_type i = 0; i < x.size(); i++)
+				_array[i] = x._array[i];
+			this->_vecSize = x.size();
+			return *this;
+		}
 
         iterator begin() {
-            return (this->_array);
+            return this->_array;
         }
 
         const_iterator begin() const {
@@ -100,19 +104,19 @@ namespace ft {
         }
 
         reverse_iterator rbegin() {
-            return this->_array + _vecSize;
+            return reverse_iterator(this->_array + this->_vecSize - 1);
         }
 
         const_reverse_iterator rbegin() const {
-            return this->_array + _vecSize;
+            return const_reverse_iterator(this->_array + this->_vecSize - 1);
         }
 
         reverse_iterator rend() {
-            return this->_array;
+            return reverse_iterator(this->begin() - 1);
         }
 
         const_reverse_iterator rend() const {
-            return this->_array;
+            return const_reverse_iterator(this->begin() - 1);
         }
 
         size_type size() const {
@@ -133,8 +137,7 @@ namespace ft {
             pointer tmp = _myAlloc.allocate(n);
             size_t i;
 
-            this->_vecSize = n;
-            for (i = 0; i < n || i < this->_vecSize; i++)
+            for (i = 0; i < this->_vecSize; i++)
                 tmp[i] = this->_array[i];
             if (n > this->_capacity * 2)
                 this->_capacity = n;
@@ -142,11 +145,14 @@ namespace ft {
                 this->_capacity *= 2;
             reallocArray(this->_capacity);
             i = 0;
-            for (i = 0; i < n || i < this->_vecSize; i++)
+            for (i = 0; i < this->_vecSize; i++)
                 this->_array[i] = tmp[i];
-            for (i = 0; i < n; i++)
+            while (i < n) {
                 this->_array[i] = val;
-            this->_array[i] = NULL;
+				i++;
+			}
+            this->_array[i] = 0;
+            this->_vecSize = n;
             _myAlloc.destroy(tmp);
             _myAlloc.deallocate(tmp, n);
         }
@@ -213,8 +219,9 @@ namespace ft {
             InputIterator tmpFirst = first;
             size_t newSize = 0;
 
-            for (first; first != last; first++) {
+            while (first != last) {
                 newSize++;
+				first++;
             }
             first = tmpFirst;
             if (newSize > _capacity) {
@@ -222,7 +229,6 @@ namespace ft {
                 this->_capacity = newSize;
                 this->_vecSize = newSize;
             }
-            std::cout << *first << std::endl;
             for (size_t i = 0; first != last; first++) {
                 this->_array[i] = *first;
                 i++;
@@ -279,8 +285,10 @@ namespace ft {
 					_myAlloc.destroy(&tmp[i]);
 				}
 				_vecSize = index;
-				for (first; first != last; first++)
+				while (first != last) {
 					push_back(*first);
+					first++;
+				}
 				for (size_type i = index; i < size_tmp; i++) {
 					push_back(tmp[i]);
 					_myAlloc.destroy(&tmp[i]);
@@ -305,28 +313,31 @@ namespace ft {
             this->_vecSize--;
             _myAlloc.destroy(tmp);
             _myAlloc.deallocate(tmp, _capacity);
-            return this->_array[pos];
+            return iterator(this->_array + pos - 1);
         }
 
         iterator erase (iterator first, iterator last) {
             pointer tmp = _myAlloc.allocate(this->_capacity);
             size_type posFirst = first - this->begin();
             size_type posLast = last - this->begin();
-            size_t j = 0;
+			size_t i;
 
-            for (size_t i = 0; i < this->_vecSize; i++)
+			for (i = 0; i != posFirst; i++) {
                 tmp[i] = this->_array[i];
-            for (size_t i = 0; i < this->_vecSize; i++) {
-                if (i == posFirst)
-                    for (posFirst; posFirst < posLast; posFirst++)
-                        i++;
-                this->_array[j] = tmp[i];
-                j++;
-            }
+			}
+            size_t j = i;
+			while (i != posLast)
+				i++;
+			while (i < _vecSize) {
+				tmp[j] = _array[i];
+				i++;
+				j++;
+			}
             this->_vecSize -= (posLast - posFirst);
-            _myAlloc.destroy(tmp);
-            _myAlloc.deallocate(tmp, _capacity);
-            return this->_array[pos];
+            _myAlloc.destroy(_array);
+            _myAlloc.deallocate(_array, _capacity);
+			_array = tmp;
+            return iterator(this->_array + _vecSize - 1);
         }
 
         void push_back (const value_type& val) {
@@ -354,7 +365,6 @@ namespace ft {
         }
 
         void pop_back() {
-           // this->_myAlloc.destroy(_array);
             this->_vecSize--;
         }
 
@@ -399,7 +409,6 @@ namespace ft {
                 else {
                     reallocArray(this->_capacity * 2);
                     this->_capacity *= 2;
-            std::cout << "size: " << this->size() << " capacity: " << this->capacity() << std::endl;
                 }
             }
         }

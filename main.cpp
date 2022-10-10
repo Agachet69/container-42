@@ -6,7 +6,7 @@
 /*   By: agachet <agachet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 22:59:55 by agachet           #+#    #+#             */
-/*   Updated: 2022/10/06 20:04:50 by agachet          ###   ########.fr       */
+/*   Updated: 2022/10/10 19:35:06 by agachet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,24 +18,9 @@
 #include "vector.hpp"
 #include "stack.hpp"
 #include "map.hpp"
-#include "pair.hpp"
-
-
-template<typename Key, typename Value>
-std::ostream& operator<<(std::ostream& os, ft::map<Key, Value> const& m)
-{
-   os << "{ ";
-   for(auto const& p: m)
-        os << '(' << p.first << ':' << p.second << ") ";
-   return os << "}\n";
-}
- 
-struct Point { double x, y; };
-struct PointCmp {
-    bool operator()(const Point& lhs, const Point& rhs) const {
-        return lhs.x < rhs.x; // NB. intentionally ignores y
-    }
-};
+#include <vector>
+#include <deque>
+#include <stack>
 
 int main() {
     //////////////////////////////////////////////////////// TEST VECTOR ////////////////////////////////////////////////////////
@@ -120,36 +105,36 @@ int main() {
     /*                                                ft::vector::resize                                                       */
 
         //  ft::vector<int> myvector;
-        // set some initial content:
+        // //set some initial content:
         //  for (int i=1;i<10;i++) myvector.push_back(i);
-        //
+
         //  myvector.resize(5);
         //  myvector.resize(8,100);
         //  myvector.resize(12);
-        //
+
         //  std::cout << "myvector contains:";
-        //  for (int i=0;i<myvector.size();i++)
+        //  for (int i=0;i<(int)myvector.size();i++)
         //    std::cout << ' ' << myvector[i];
         //  std::cout << '\n';
 
     /*                                                ft::vector::capacity                                                     */
 
-        // int sz = 100;
-        // ft::vector<int> v;
-        // auto cap = v.capacity();
-        // std::cout << "Initial size: " << v.size() << ", capacity: " << cap << '\n';
-        // std::cout << "\nDemonstrate the capacity's growth policy."
-        //              "\nSize:  Capacity:  Ratio:\n" << std::left;
-        // while (sz-- > 0) {
-        //     v.push_back(sz);
-        //     if (cap != v.capacity()) {
-        //         std::cout << std::setw( 7) << v.size()
-        //                   << std::setw(11) << v.capacity()
-        //                   << std::setw(10) << v.capacity() / static_cast<float>(cap) << '\n';
-        //         cap = v.capacity();
-        //     }
-        // }
-        // std::cout << "\nFinal size: " << v.size() << ", capacity: " << v.capacity() << '\n';
+		//int sz = 100;
+		//ft::vector<int> v;
+		//uint cap = v.capacity();
+		//std::cout << "Initial size: " << v.size() << ", capacity: " << cap << '\n';
+		//std::cout << "\nDemonstrate the capacity's growth policy."
+		//			"\nSize:  Capacity:  Ratio:\n" << std::left;
+		//while (sz-- > 0) {
+		//	v.push_back(sz);
+		//	if (cap != v.capacity()) {
+		//		std::cout << std::setw( 7) << v.size()
+		//				<< std::setw(11) << v.capacity()
+		//				<< std::setw(10) << v.capacity() / static_cast<float>(cap) << '\n';
+		//		cap = v.capacity();
+		//	}
+		//}
+		//std::cout << "\nFinal size: " << v.size() << ", capacity: " << v.capacity() << '\n';
 
     /*                                                ft::vector::reserve                                                      */
 
@@ -178,10 +163,10 @@ int main() {
 
     /*                                                ft::vector::front                                                        */
 
-        // ft::vector<int> myvector();
+        // ft::vector<int> myvector;
         // myvector.push_back(78);
         // myvector.push_back(16);
-        // now front equals 78, and back 16
+        // //now front equals 78, and back 16
         // myvector.front() -= myvector.back();
         // std::cout << "myvector.front() is now " << myvector.front() << '\n';
 
@@ -268,17 +253,17 @@ int main() {
 
     /*                                                ft::vector::erase                                                        */
 
-        // ft::vector<int> myvector;
-        // // set some values (from 1 to 10)
-        // for (int i=1; i<=10; i++) myvector.push_back(i);
-        // // erase the 6th element
-        // myvector.erase (myvector.begin()+5);
-        // // erase the first 3 elements:
-        // myvector.erase (myvector.begin(),myvector.begin()+3);
-        // std::cout << "myvector contains:";
-        // for (unsigned i=0; i<myvector.size(); ++i)
-        //     std::cout << ' ' << myvector[i];
-        // std::cout << '\n';
+        //ft::vector<int> myvector;
+        //// set some values (from 1 to 10)
+        //for (int i=1; i<=10; i++) myvector.push_back(i);
+        //// erase the 6th element
+        //myvector.erase (myvector.begin()+5);
+        //// erase the first 3 elements:
+        //myvector.erase (myvector.begin(),myvector.begin()+3);
+        //std::cout << "myvector contains:";
+        //for (unsigned i=0; i<myvector.size(); ++i)
+        //    std::cout << ' ' << myvector[i];
+        //std::cout << '\n';
 
     /*                                                ft::vector::push_back                                                    */
 
@@ -290,6 +275,9 @@ int main() {
     //     myvector.push_back (myint);
     //   } while (myint);
     //   std::cout << "myvector stores " << int(myvector.size()) << " numbers.\n";
+    //    for (unsigned i=0; i<myvector.size(); ++i)
+    //        std::cout << ' ' << myvector[i];
+    //    std::cout << '\n';
 
     /*                                                ft::vector::pop_back                                                     */
 
@@ -327,8 +315,6 @@ int main() {
 
         // ft::vector<int> foo (3,100);   // three ints with a value of 100
         // ft::vector<int> bar (5,200);   // five ints with a value of 200
-        // std::cout << foo.capacity() << std::endl;
-        // std::cout << bar.capacity() << std::endl;
         // foo.swap(bar);
         // std::cout << "foo contains:";
         // for (unsigned i=0; i<foo.size(); i++)
@@ -396,7 +382,6 @@ int main() {
 
     /*                                           Non-member function overloads ft::swap                                        */
 
-        // unsigned int i;
         // ft::vector<int> foo (3,100);   // three ints with a value of 100
         // ft::vector<int> bar (5,200);   // five ints with a value of 200
         // foo.swap(bar);
@@ -411,16 +396,17 @@ int main() {
 
     //////////////////////////////////////////////////////// TEST STACK /////////////////////////////////////////////////////////
     /*                                                  ft::stack::constructor                                                 */
-        // std::deque<int> mydeque (3,100);          // deque with 3 elements
-        // ft::vector<int> myvector (2,200);        // vector with 2 elements
-        // ft::stack<int> first;                    // empty stack
-        // ft::stack<int> second (mydeque);         // stack initialized to copy of deque
-        // ft::stack<int,ft::vector<int> > third;  // empty stack using vector
-        // ft::stack<int,ft::vector<int> > fourth (myvector);
-       // std::cout << "size of first: " << first.size() << '\n';
-      //  std::cout << "size of second: " << second.size() << '\n';
-      //  std::cout << "size of third: " << third.size() << '\n';
-      //  std::cout << "size of fourth: " << fourth.size() << '\n';
+
+		//std::deque<int> mydeque (3,100);          // deque with 3 elements
+        //ft::vector<int> myvector (2,200);        // vector with 2 elements
+        //ft::stack<int> first;                    // empty stack
+        //ft::stack<int> second (myvector);         // stack initialized to copy of deque
+        //ft::stack<int,ft::vector<int> > third;  // empty stack using vector
+        //ft::stack<int,ft::vector<int> > fourth (myvector);
+    	//std::cout << "size of first: " << first.size() << '\n';
+    	//std::cout << "size of second: " << second.size() << '\n';
+    	//std::cout << "size of third: " << third.size() << '\n';
+    	//std::cout << "size of fourth: " << fourth.size() << '\n';
 
     /*                                                      ft::stack::empty                                                   */
 
@@ -476,35 +462,70 @@ int main() {
         // std::cout << '\n';
 
     /*                                                      ft::stack::operators                                               */
-        // ft::stack<int> alice;
-        // ft::stack<int> bob;
-        // ft::stack<int> eve;
-        // alice.push(1);
-        // alice.push(2);
-        // alice.push(3);
-        // bob.push(7);
-        // bob.push(8);
-        // bob.push(9);
-        // bob.push(10);
-        // eve.push(1);
-        // eve.push(2);
-        // eve.push(3);
-        // std::cout << std::boolalpha;
-        // // Compare non equal containers
-        // std::cout << "alice == bob returns " << (alice == bob) << '\n';
-        // std::cout << "alice != bob returns " << (alice != bob) << '\n';
-        // std::cout << "alice <  bob returns " << (alice < bob) << '\n';
-        // std::cout << "alice <= bob returns " << (alice <= bob) << '\n';
-        // std::cout << "alice >  bob returns " << (alice > bob) << '\n';
-        // std::cout << "alice >= bob returns " << (alice >= bob) << '\n';
-        // std::cout << '\n';
-        // // Compare equal containers
-        // std::cout << "alice == eve returns " << (alice == eve) << '\n';
-        // std::cout << "alice != eve returns " << (alice != eve) << '\n';
-        // std::cout << "alice <  eve returns " << (alice < eve) << '\n';
-        // std::cout << "alice <= eve returns " << (alice <= eve) << '\n';
-        // std::cout << "alice >  eve returns " << (alice > eve) << '\n';
-        // std::cout << "alice >= eve returns " << (alice >= eve) << '\n';
+
+        //std::cout << " \n MY STACK" << '\n';
+		//ft::stack<int> alice;
+        //ft::stack<int> bob;
+        //ft::stack<int> eve;
+        //alice.push(1);
+        //alice.push(2);
+        //alice.push(3);
+        //bob.push(7);
+        //bob.push(8);
+        //bob.push(9);
+        //bob.push(10);
+        //eve.push(1);
+        //eve.push(2);
+        //eve.push(3);
+        //std::cout << std::boolalpha;
+        //// Compare non equal containers
+        //std::cout << "alice == bob returns " << (alice == bob) << '\n';
+        //std::cout << "alice != bob returns " << (alice != bob) << '\n';
+        //std::cout << "alice <  bob returns " << (alice < bob) << '\n';
+        //std::cout << "alice <= bob returns " << (alice <= bob) << '\n';
+        //std::cout << "alice >  bob returns " << (alice > bob) << '\n';
+        //std::cout << "alice >= bob returns " << (alice >= bob) << '\n';
+        //std::cout << '\n';
+        //// Compare equal containers
+        //std::cout << "alice == eve returns " << (alice == eve) << '\n';
+        //std::cout << "alice != eve returns " << (alice != eve) << '\n';
+        //std::cout << "alice <  eve returns " << (alice < eve) << '\n';
+        //std::cout << "alice <= eve returns " << (alice <= eve) << '\n';
+        //std::cout << "alice >  eve returns " << (alice > eve) << '\n';
+        //std::cout << "alice >= eve returns " << (alice >= eve) << '\n';
+
+        //std::cout << " \n TRUE STACK" << '\n';
+
+
+		//std::stack<int> alices;
+        //std::stack<int> bobs;
+        //std::stack<int> eves;
+        //alices.push(1);
+        //alices.push(2);
+        //alices.push(3);
+        //bobs.push(7);
+        //bobs.push(8);
+        //bobs.push(9);
+        //bobs.push(10);
+        //eves.push(1);
+        //eves.push(2);
+        //eves.push(3);
+        //std::cout << std::boolalpha;
+        //// Compare non equal containers
+        //std::cout << "alice == bob returns " << (alices == bobs) << '\n';
+        //std::cout << "alice != bob returns " << (alices != bobs) << '\n';
+        //std::cout << "alice <  bob returns " << (alices < bobs) << '\n';
+        //std::cout << "alice <= bob returns " << (alices <= bobs) << '\n';
+        //std::cout << "alice >  bob returns " << (alices > bobs) << '\n';
+        //std::cout << "alice >= bob returns " << (alices >= bobs) << '\n';
+        //std::cout << '\n';
+        //// Compare equal containers
+        //std::cout << "alice == eve returns " << (alices == eves) << '\n';
+        //std::cout << "alice != eve returns " << (alices != eves) << '\n';
+        //std::cout << "alice <  eve returns " << (alices < eves) << '\n';
+        //std::cout << "alice <= eve returns " << (alices <= eves) << '\n';
+        //std::cout << "alice >  eve returns " << (alices > eves) << '\n';
+        //std::cout << "alice >= eve returns " << (alices >= eves) << '\n';
 
     ////////////////////////////////////////////////////////// TEST PAIR ////////////////////////////////////////////////////////
     /*                                                      ft::make_pair                                                      */
@@ -512,7 +533,7 @@ int main() {
     //   ft::pair <int,int> foo;
     //   ft::pair <int,int> bar;
     //   foo = ft::make_pair (10,20);
-    //   bar = ft::make_pair (10.5,'A'); // ok: implicit conversion from pair<double,char>
+    //   bar = ft::make_pair (10.5,'A');
     //   std::cout << "foo: " << foo.first << ", " << foo.second << '\n';
     //   std::cout << "bar: " << bar.first << ", " << bar.second << '\n';
 
@@ -550,21 +571,17 @@ int main() {
     ////////////////////////////////////////////////////////// TEST MAP /////////////////////////////////////////////////////////
     /*                                                      ft::map::constructor                                               */
 
-        // ft::map<std::string, int> map1;
-        // map1["something"] = 69;
-        // map1["anything"] = 199;
-        // map1["that thing"] = 50;
-        // std::cout << "map1 = " << map1;
-        
-        // // (4) Range constructor
-        // ft::map<std::string, int> iter(map1.find("anything"), map1.end());
-        // std::cout << "\niter = " << iter;
-        // std::cout << "map1 = " << map1;
-        
-        // // (6) Copy constructor
-        // ft::map<std::string, int> copied(map1);
-        // std::cout << "\ncopied = " << copied;
-        // std::cout << "map1 = " << map1;
+		//ft::map<char,int> first;
+
+		//first['a']=10;
+		//first['b']=30;
+		//first['c']=50;
+		//first['d']=70;
+
+		//ft::map<char,int> second (first.begin(),first.end());
+
+		//ft::map<char,int> third (second);
+
 
     /*                                                      ft::map::operator=                                                 */
 

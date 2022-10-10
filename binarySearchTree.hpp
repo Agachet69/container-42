@@ -6,7 +6,7 @@
 /*   By: agachet <agachet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/28 04:11:44 by agachet           #+#    #+#             */
-/*   Updated: 2022/10/05 19:53:47 by agachet          ###   ########.fr       */
+/*   Updated: 2022/10/10 19:19:20 by agachet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ struct binarySearchTree {
 
     binarySearchTree(const Pair & val) : _left(LEAF), _right(LEAF), _parent(LEAF), _value(val) {}
 
-    binarySearchTree(const binarySearchTree &cpy) : _parent(cpy._parent), _left(cpy._left), _right(cpy._right), _value(cpy._value), color(cpy.color) {}
+    binarySearchTree(const binarySearchTree &cpy) : _left(cpy._left), _right(cpy._right), _parent(cpy._parent), _value(cpy._value), color(cpy.color) {}
 
     ~binarySearchTree() {}
 

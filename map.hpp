@@ -6,7 +6,7 @@
 /*   By: agachet <agachet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/24 18:16:44 by agachet           #+#    #+#             */
-/*   Updated: 2022/10/06 20:43:36 by agachet          ###   ########.fr       */
+/*   Updated: 2022/10/10 19:27:35 by agachet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ namespace ft {
                     }
             };
 
-            explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _sizeMap(0), _root(LEAF), _comp(comp), _allocPair(alloc), _allocNode(std::allocator<node>()) {
+            explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _root(LEAF), _comp(comp), _allocPair(alloc), _allocNode(std::allocator<node>()), _sizeMap(0) {
 				_end = _allocNode.allocate(1);
 				_allocNode.construct(_end, node());
                 _revBegin = _allocNode.allocate(1);
@@ -79,7 +79,7 @@ namespace ft {
             }
 
             template <class InputIterator>
-            map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _sizeMap(0), _comp(comp), _allocPair(alloc), _allocNode(std::allocator<node>()) {
+            map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _comp(comp), _allocPair(alloc), _allocNode(std::allocator<node>()), _sizeMap(0) {
                 _end = _allocNode.allocate(1);
 			    _allocNode.construct(_end, node());
                 _revBegin = _allocNode.allocate(1);
@@ -93,7 +93,7 @@ namespace ft {
 				}
             }
 
-            map (const map& x) : _comp(x._comp), _allocPair(x._allocPair), _allocNode(x._allocNode), _root(NULL), _sizeMap(0) {
+            map (const map& x) : _root(NULL), _comp(x._comp), _allocPair(x._allocPair), _allocNode(x._allocNode), _sizeMap(0) {
                 _end = _allocNode.allocate(1);
     			_allocNode.construct(_end, node());
     			_revBegin = _allocNode.allocate(1);
@@ -119,7 +119,6 @@ namespace ft {
                 _sizeMap = 0;
                 _allocPair = x._allocPair;
                 _allocNode = x._allocNode;
-                _end = x._end;
 				const_iterator beg = x.begin();
 				const_iterator endx = x.end();
 				if (beg != endx)
@@ -249,7 +248,7 @@ namespace ft {
 
             void erase (iterator first, iterator last) {
                 iterator tpmFirst = first;
-                int i;
+                int i = 0;
                 iterator delNode;
 
                 while (first != last) {
@@ -300,8 +299,6 @@ namespace ft {
             }
 
             iterator find (const key_type& k) {
-                node *tmp = _root;
-
                 for (iterator it=this->begin(); it!=this->end(); ++it) {
                     if (it->first == k)
                         return it;
@@ -432,7 +429,6 @@ namespace ft {
 					return;
 				}
 				value_type tmp = replaceNode->_value;
-				node *oldReplace = replaceNode; 
 				node *oldDelNode = delNode;
                 replaceNode = swapValue(replaceNode, delNode->_value);
                 delNode = swapValue(delNode, tmp);
@@ -451,7 +447,7 @@ namespace ft {
                     nParent->_left->_parent = x;
                 nParent->_left = x;
             }
-            
+
             void rightRotateErase(node *x) {
                 node *nParent = x->_left;
                 if (x == _root)
@@ -467,7 +463,7 @@ namespace ft {
                 if (x->_parent != NULL) {
                     if (x == x->_parent->_left) {
                         x->_parent->_left = nParent;
-                    } 
+                    }
                     else {
                         x->_parent->_right = nParent;
                     }

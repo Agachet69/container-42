@@ -5,35 +5,40 @@
 #                                                     +:+ +:+         +:+      #
 #    By: agachet <agachet@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2021/07/14 18:52:17 by agachet           #+#    #+#              #
-#    Updated: 2021/10/26 17:29:34 by agachet          ###   ########.fr        #
+#    Created: 2022/10/10 15:47:49 by agachet           #+#    #+#              #
+#    Updated: 2022/10/10 15:52:41 by agachet          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME 	= megaphone
+NAME	=	ft_container
 
-CC		= clang++
+CC		=	clang++
 
-SRCS 	= test.cpp
+FLAGS	=	-Werror -Wextra -Wall -std=c++98
 
-OBJS	= $(SRCS:.cpp=.o)
+SRCS	=	main.cpp
 
-FLAGS	= -Wall -Wextra -Werror
+OBJS	=	$(SRCS:.cpp=.o)
 
 %.o:	%.cpp
-		$(CC) $(FLAGS) -c $< -o $@
+		@$(CC) $(FLAGS) -c $< -o $@
 
-all:		$(NAME)
+all:	$(NAME)
 
-$(NAME)	:	$(OBJS)
-			$(CC) $(FLAGS) $(OBJS) -o $(NAME)
+$(NAME):	$(OBJS)
+			@$(CC) $(FLAGS) $(OBJS) -o $(NAME)
+			@echo [$(NAME)]
 
 clean:
-		rm -f $(OBJS)
+		@rm -f $(OBJS)
+		@echo [CLEAN]
 
 fclean:
-		rm -rf ${NAME} $(OBJS)
+		@rm -f $(OBJS) $(NAME)
+		@rm -f *_shrubbery
+		@echo [FCLEAN]
 
 re:		fclean all
 
-.PHONY: all fclean re
+
+.PHONY: re all fclean clean

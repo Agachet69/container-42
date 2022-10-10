@@ -6,7 +6,7 @@
 /*   By: agachet <agachet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 19:57:26 by agachet           #+#    #+#             */
-/*   Updated: 2022/09/14 19:57:26 by agachet          ###   ########.fr       */
+/*   Updated: 2022/10/10 17:48:44 by agachet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@ namespace ft {
         typedef typename iterator_traits<Iterator>::difference_type         difference_type;
         typedef typename iterator_traits<Iterator>::pointer                 pointer;
         typedef typename iterator_traits<Iterator>::reference               reference;
-    
+
         reverse_iterator() : _ourIt(), _copyIt() {}
-            
+
         explicit reverse_iterator (iterator_type it) : _ourIt(it), _copyIt(it) {}
 
         template <class Iter>
@@ -36,7 +36,7 @@ namespace ft {
         ~reverse_iterator() {}
 
         iterator_type base() const {
-            return (_ourIt + 1); // à tester si sa renvoi bien la position +1 et pas le resultat +1
+            return (_ourIt + 1);
         }
 
         reference operator*() const {
@@ -46,7 +46,7 @@ namespace ft {
         reverse_iterator operator+ (difference_type n) const {
             return reverse_iterator(_ourIt - n);
         }
-        
+
         reverse_iterator& operator++() {
             _ourIt--;
             return *this;
@@ -90,7 +90,7 @@ namespace ft {
         reference operator[] (difference_type n) const {
             return _ourIt[static_cast<difference_type>(-n - 1)];
         }
-        
+
         iterator_type get_ourIt() const {
             return (_ourIt);
         }
